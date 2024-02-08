@@ -2,7 +2,7 @@ import streamlit as st
 import pandas as pd
 from matplotlib import pyplot as plt
 import matplotlib.ticker as mticker
-from st_aggrid import AgGrid, ColumnsAutoSizeMode
+from st_aggrid import AgGrid, ColumnsAutoSizeMode, GridUpdateMode
 from st_aggrid.grid_options_builder import GridOptionsBuilder 
 
 def get_shots_STATUS_count(proj_tasks):
@@ -109,7 +109,8 @@ task_list = [
                 
 ]
 
-
+shot_selected_aggrid = ''
+return_value = ''
 # creating UI for all tasks
 for tasks in task_list:
     for proj, proj_tasks in tasks.items():
@@ -122,9 +123,6 @@ for tasks in task_list:
             # col1, col2 = st.columns([0.7, 0.3])
             col1, col2, col3 = st.columns([0.5, 0.25, 0.25])
 
-            # attaching a streamlit data_editor table to col1
-            # col1.data_editor(df, key=proj, disabled=True)
-
             # attaching st_aggrid to col1
             with col1:
                 options_builder = GridOptionsBuilder.from_dataframe(df)
@@ -136,16 +134,21 @@ for tasks in task_list:
                 grid_options = options_builder.build()
                 # grid_options['rowHeight'] = 50
                 # Create AgGrid component
-                grid = AgGrid(df, 
+                return_value = AgGrid(df, 
                     gridOptions = grid_options,
                     allow_unsafe_jscode=True,
                     height=400, width=500, theme='material', 
                     enable_enterprise_modules=True,
                     columns_auto_size_mode=ColumnsAutoSizeMode.FIT_CONTENTS)
+
+                if return_value['selected_rows']:
+                    shot_selected_aggrid = return_value['selected_rows'][0]['TASK NAME']
+                else:
+                    shot_selected_aggrid = ''
             
 
             # attaching comment history to col2
-            col2.write('huhuhuhuhuhuhuhuhu')
+            col2.write(shot_selected_aggrid)
             
             # attaching option for graph type to col3
             graph_type = col3.selectbox(label='Select graph type : ', 
